@@ -1,0 +1,40 @@
+{% extends 'layout.html.j2' %} 
+{% block title %}
+<title>Details - MyJournal</title>
+{% endblock %} 
+{% block content %}
+<div class="entry-list single">
+	<article>
+		<h1>{{ entry.title }}</h1>
+		<time datetime="{{ entry.date.strftime('%Y-%d-%m') }}">
+            {{ entry.date.strftime('%B %d, %Y') }}
+        </time>
+		<div class="entry">
+			<h3>Time Spent:</h3>
+			<p>{{ entry.time_spent }} Hours</p>
+		</div>
+		<div class="entry">
+			<h3>What I Learned:</h3>
+			<p>
+				{{ entry.what_you_learned }}
+			</p>
+		</div>
+		<div class="entry">
+			<h3>Resources to Remember:</h3>
+			<p>
+				{{ entry.resource_to_remember }}
+			<pl>
+		</div>
+	</article>
+</div>
+{% endblock %} 
+{% block bottom %}
+<div class="paginate edit">
+	
+		<a href="{{ url_for('edit_entry', slug=entry.slug) }}" class="item">Edit Entry</a>
+	
+    
+		<a href="{{ url_for('delete_entry', slug=entry.slug) }}" class="item">Delete Entry</a>
+	
+</div>
+{% endblock %}

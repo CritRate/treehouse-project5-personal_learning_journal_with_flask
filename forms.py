@@ -18,7 +18,7 @@ def name_exists(form, field):
 
 def title_exists(form, field):
     try:
-        models.Entry.get(models.Entry.title**field.data)
+        models.Entry.get(models.Entry.slug**models.create_slug(field.data))
         raise ValidationError('Title already exists! Try a different one')
     except models.DoesNotExist:
         return None

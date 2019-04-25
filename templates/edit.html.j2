@@ -1,17 +1,33 @@
-{% from 'macros.html' import render_field %} {% extends 'layout.html' %} {%
-block title %}
+{% from 'macros.html.j2' import render_field %} 
+{% extends 'layout.html.j2' %} 
+{% block title %}
 <title>Edit Entry - MyJournal</title>
-{% endblock %} {% block content %}
+{% endblock %} 
+{% block content %}
 <h2>Edit Entry</h2>
 <br />
-<form>
 	<form
 		method="POST"
-		action="{{ url_for('edit_entry', slug='future-form') }}"
+		action="{{ url_for('edit_entry', slug=slug) }}"
 		class="form"
 	>
 		{{ form.hidden_tag() }}
 		{% for field in form if field.widget.input_type != 'hidden' %}
+        {# {% if field.label.text == 'Title' %}
+            {% set value = data.title %}
+        {% endif %} #}
+        {# {% if field.label.text == 'Date' %}
+            {% set value = data.date %}
+        {% endif %}
+        {% if field.label.text == 'Time spent(in hours)' %}
+            {% set value = data.time_spent %}
+        {% endif %}
+        {% if field.label.text == 'What i learned' %}
+            {% set value = data.what_i_learned %}
+        {% endif %}
+        {% if field.label.text == 'Resources to remember' %}
+            {% set value = data.resources_to_remember %}
+        {% endif %} #}
 		{{ render_field(field) }}
 		{% endfor %}
 		<!-- <label for="title"> Title</label>
@@ -31,5 +47,4 @@ block title %}
 		<input type="submit" value="Publish Entry" class="button" />
 		<a href="{{ url_for('index') }}" class="button button-secondary">Cancel</a>
 	</form>
-	{% endblock %}
-</form>
+{% endblock %}

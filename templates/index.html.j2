@@ -1,0 +1,36 @@
+{% extends 'layout.html.j2'%} 
+{% block title %}
+<title>MyJournal</title>
+{% endblock %} 
+{% block content %}
+    {% if data.count() == 0 %}
+        <h2>
+            There's nothing to see here. Try adding something.
+        </h2>
+    {% endif %}
+    {% for entry in data %}
+        <article>
+            <h2>
+                <a href="{{ url_for('detail', slug=entry.slug) }}">{{ entry.title }}</a>
+            </h2>
+            <time datetime="{{ entry.date.strftime('%Y-%d-%m') }}">
+                {{ entry.date.strftime('%B %d, %Y') }}
+            </time>
+        </article>
+    {% endfor %}
+{% endblock %}
+{% block bottom %} 
+    <div class="paginate">     
+        {% if g.page|int > 1 and g.max_page|int > 1 %}
+            <a href="{{ url_for('index', page=g.page-1) }}" class="item" style="text-align: center;">Previous</a>
+        {% else %}
+            <a href="" class="item"></a>
+        {% endif %} 
+            <span class="page" class="item">Page {{ g.page }} of {{ g.max_page }}</span> 
+        {% if g.page|int < g.max_page|int and g.page|int != g.max_page|int %}
+            <a href="{{ url_for('index', page=g.page+1) }}" class="item" style="text-align: center;">Next</a>
+        {% else %}
+            <a href="" class="item"></a>    
+        {% endif %}    
+    </div>
+{% endblock %}

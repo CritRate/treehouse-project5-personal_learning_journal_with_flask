@@ -19,7 +19,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="/static/css/normalize.css" />
-		<link rel="stylesheet" href="/static/css/site.css?verion=1.4" />
+		<link rel="stylesheet" href="/static/css/site.css?verion=1.12" />
 	</head>
 	<body>
 		<header>
@@ -55,15 +55,20 @@
 		<section>
 			<div class="container">
 				<div class="entry-list">
-					{% with messages = get_flashed_messages() %} {% if messages %} {% for
-					message in messages %}
-					<div class="flash">{{ message }}</div>
-					<br />
-					{% endfor %} {% endif %} {% endwith %} {% block content %} {% endblock
-					%}
+					{% with messages = get_flashed_messages() %} 
+                        {% if messages %} 
+                            {% for message in messages %}
+					            <div class="flash">{{ message }}</div>
+					            <br />
+					        {% endfor %} 
+                        {% endif %} 
+                    {% endwith %} 
+                    {% block content %} 
+                    {% endblock %}
 				</div>
 			</div>
-			{% block bottom %}{% endblock %}
+			{% block bottom %}
+            {% endblock %}
 		</section>
 		<footer>
 			<div>

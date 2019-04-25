@@ -3,11 +3,19 @@ from peewee import *
 from flask_login import UserMixin
 from flask_bcrypt import generate_password_hash
 
+import string
+
 DATABASE = SqliteDatabase('journal.db')
 
 
 def init_db():
     DATABASE.create_tables([User, Entry, Tag], safe=True)
+
+
+def create_slug(title):
+    slug = title.translate(str.maketrans('', '', string.punctuation))
+    slug = slug.replace(' ', '-')
+    return slug
 
 
 class User(UserMixin, Model):
@@ -31,6 +39,7 @@ class User(UserMixin, Model):
 class Entry(Model):
     user = ForeignKeyField(User, related_name='entries')
     title = CharField(unique=True)
+    slug = CharField(unique=True)
     date = DateField()
     time_spent = IntegerField()
     what_you_learned = TextField()
@@ -38,6 +47,23 @@ class Entry(Model):
 
     class Meta:
         database = DATABASE
+
+    @classmethod
+    def create_entry(cls, user, title,
+                     date, time_spent, what_you_learned,
+                     resource_to_remember):
+        try:
+            cls.create(
+                user=user,
+                title=title,
+                slug=create_slug(title),
+                date=date,
+                time_spent=time_spent,
+                what_you_learned=what_you_learned,
+                resource_to_remember=resource_to_remember
+            )
+        except IntegrityError:
+            raise ValueError('title already exist')
 
 
 class Tag(Model):

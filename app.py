@@ -1,12 +1,12 @@
 from flask import (Flask, render_template, redirect,
-                   url_for, g, flash, request)
+                   url_for, g, flash, request, abort)
 from flask_login import (LoginManager, login_user,
                          logout_user, login_required, current_user)
 from flask_bcrypt import check_password_hash
 
 from peewee import *
-import datetime
 from math import ceil
+import datetime
 
 import models
 import forms
@@ -36,6 +36,21 @@ def user_loader(userid):
 @app.before_first_request
 def init():
     models.init_db()
+    try:
+        models.User.create_user(
+            username='miro',
+            password='miro123'
+        )
+        models.User.create_user(
+            username='miro2',
+            password='miro456'
+        )
+        models.User.create_user(
+            username='miro3',
+            password='miro789'
+        )
+    except ValueError:
+        pass
     models.DATABASE.close()
 
 
@@ -53,15 +68,24 @@ def after_request(response):
 
 @app.route('/')
 def index():
+    g.page = 1
+    g.max_page = ceil(models.Entry.select().count(None) / 10)
+    if g.max_page == 0:
+        g.max_page = 1
     # https://stackoverflow.com/questions/46741744
     # /flask-python-pass-input-as-parameter-to-function-of-different-route-with-fixe
     if request.args.get('page'):
-        g.page = int(request.args.get('page'))
+        page = int(request.args.get('page'))
+        if page < 1:
+            page = 1
+        if page > g.max_page:
+            page = g.max_page
+        g.page = page
     else:
         g.page = 1
-    g.max_page = ceil(models.Entry.select().count(None) / 10)
-    data = models.Entry.select().paginate(g.page, 10)
-    return render_template('index.html', data=data)
+    data = models.Entry.select().order_by(-models.Entry.date
+                                          ).paginate(g.page, 10)
+    return render_template('index.html.j2', data=data)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,7 +101,7 @@ def login():
                 flash('Username or password is incorrect!')
         except models.DoesNotExist:
             flash('Username or password is incorrect!')
-    return render_template('login.html', form=form)
+    return render_template('login.html.j2', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -90,7 +114,7 @@ def register():
         )
         flash('User created successfully!')
         return redirect(url_for('index'))
-    return render_template('register.html', form=form)
+    return render_template('register.html.j2', form=form)
 
 
 @app.route('/logout')
@@ -111,7 +135,7 @@ def entries():
 def new_entry():
     form = forms.EntryForm()
     if form.validate_on_submit():
-        models.Entry.create(
+        models.Entry.create_entry(
             user=current_user._get_current_object(),
             title=form.title.data,
             date=form.date.data,
@@ -120,44 +144,51 @@ def new_entry():
             resource_to_remember=form.resources_to_remember.data
         )
         return redirect(url_for('index'))
-    return render_template('new.html', form=form)
+    return render_template('new.html.j2', form=form)
 
 
-@app.route('/entries/<slug>/edit')
+@app.route('/entries/<slug>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_entry(slug):
+    data = models.Entry.get(models.Entry.slug == slug)
+    if current_user._get_current_object() != data.user:
+        return abort(404)
     form = forms.EntryForm()
     if form.validate_on_submit():
-        pass
-    return render_template('edit.html', form=form)
+        query = models.Entry.update(
+            title=form.title.data,
+            date=form.date.data,
+            time_spent=form.time_spent.data,
+            what_you_learned=form.what_i_learned.data,
+            resource_to_remember=form.resources_to_remember.data
+        ).where(
+            models.Entry.slug == slug
+        )
+        query.execute()
+        return redirect(url_for('index'))
+    form.title.data = data.title
+    form.date.data = data.date
+    form.time_spent.data = data.time_spent
+    form.what_i_learned.data = data.what_you_learned
+    form.resources_to_remember.data = data.resource_to_remember
+    return render_template('edit.html.j2', form=form, slug=data.slug)
 
 
 @app.route('/entries/<slug>/delete')
 @login_required
 def delete_entry(slug):
+    data = models.Entry.get(models.Entry.slug == slug)
+    if current_user._get_current_object() != data.user:
+        return abort(404)
+    data.delete_instance()
     return redirect(url_for('index'))
 
 
 @app.route('/entries/<slug>')
 def detail(slug):
-    return render_template('detail.html')
+    entry = models.Entry.get(models.Entry.slug == slug)
+    return render_template('detail.html.j2', entry=entry)
 
 
 if __name__ == "__main__":
-    try:
-        models.User.create_user(
-            username='miro',
-            password='miro123'
-        )
-        models.User.create_user(
-            username='miro2',
-            password='miro456'
-        )
-        models.User.create_user(
-            username='miro3',
-            password='miro789'
-        )
-    except ValueError:
-        pass
-
     app.run(debug=DEBUG, host=HOST, port=PORT)

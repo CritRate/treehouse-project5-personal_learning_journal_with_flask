@@ -1,7 +1,9 @@
-{% from 'macros.html' import render_field %} {% extends 'layout.html' %} {%
-block title %}
+{% from 'macros.html.j2' import render_field %} 
+{% extends 'layout.html.j2' %} 
+{% block title %}
 <title>Log In - MyJournal</title>
-{% endblock %} {% block content %}
+{% endblock %} 
+{% block content %}
 <form method="POST" action="{{ url_for('login') }}" class="form">
 	{{ form.hidden_tag() }}
 	<!-- https://stackoverflow.com/questions/10763139

@@ -1,0 +1,17 @@
+{% from 'macros.html.j2' import render_field %} 
+{% extends 'layout.html.j2' %} 
+{% block title %}
+<title>New Entry - MyJournal</title>
+{% endblock %} 
+{% block content %}
+    <h2>New Entry</h2>
+    <br />
+    <form method="POST" action="{{ url_for('new_entry') }}" class="form">
+	    {{ form.hidden_tag() }}
+	    {% for field in form if field.widget.input_type != 'hidden' %}
+	    {{ render_field(field) }}
+	    {% endfor %}
+	    <input type="submit" value="Publish Entry" class="button" />
+	    <a href="{{ url_for('index') }}" class="button button-secondary">Cancel</a>
+    </form>
+{% endblock %}

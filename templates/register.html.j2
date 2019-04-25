@@ -1,7 +1,9 @@
-{% from 'macros.html' import render_field %} {% extends 'layout.html' %} {%
-block title %}
+{% from 'macros.html.j2' import render_field %}
+{% extends 'layout.html.j2' %}
+{% block title %}
 <title>Create User - MyJournal</title>
-{% endblock %} {% block content %}
+{% endblock %}
+{% block content %}
 <form method="POST" action="{{ url_for('register') }}" class="form">
 	{{ form.hidden_tag() }}
 	{% for field in form if field.widget.input_type != 'hidden' %}
