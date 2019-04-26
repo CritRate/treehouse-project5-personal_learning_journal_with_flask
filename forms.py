@@ -3,7 +3,7 @@ from wtforms import (StringField, PasswordField, IntegerField, TextAreaField)
 from wtforms.fields.html5 import DateField
 from wtforms.validators import (
     DataRequired, Length, EqualTo, ValidationError, NumberRange)
-
+from flask import request
 
 import models
 
@@ -19,6 +19,8 @@ def name_exists(form, field):
 def title_exists(form, field):
     try:
         models.Entry.get(models.Entry.slug**models.create_slug(field.data))
+        if request.path.endswith('/edit'):
+            return None
         raise ValidationError('Title already exists! Try a different one')
     except models.DoesNotExist:
         return None
@@ -81,4 +83,7 @@ class EntryForm(FlaskForm):
     )
     resources_to_remember = TextAreaField(
         'Resources to remember', validators=[DataRequired()]
+    )
+    tags = StringField(
+        'Tags (space separated list example: work hobby happy)'
     )

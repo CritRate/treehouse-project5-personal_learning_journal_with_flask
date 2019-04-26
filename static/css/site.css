@@ -251,3 +251,14 @@ input[type='submit'] {
 	width: 33%;
 	text-align: center;
 }
+
+.tag {
+	text-align: center;
+	outline: 0;
+	background: #678f89;
+	border: 5px solid #678f89;
+	color: white;
+	border-radius: 4px;
+	text-decoration: none;
+	margin-top: 50px;
+}

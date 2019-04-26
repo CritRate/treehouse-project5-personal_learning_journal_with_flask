@@ -19,7 +19,7 @@
 			rel="stylesheet"
 		/>
 		<link rel="stylesheet" href="/static/css/normalize.css" />
-		<link rel="stylesheet" href="/static/css/site.css?verion=1.12" />
+		<link rel="stylesheet" href="/static/css/site.css?verion=1.19" />
 	</head>
 	<body>
 		<header>
@@ -37,6 +37,9 @@
 						href="{{ url_for('new_entry') }}"
 						style="margin-right: 20px"
 						><span>New Entry</span> <i class="material-icons">add</i></a
+					>
+                    <a class="button icon-right" style="margin-right: 20px"
+						><span>{{ current_user.username }}</span> <i class="material-icons">face</i></a
 					>
 					{% else %}
 					<a class="button icon-right" href="{{ url_for('login') }}"

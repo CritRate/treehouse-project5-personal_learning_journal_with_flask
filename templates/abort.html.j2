@@ -1,0 +1,10 @@
+{% extends "layout.html.j2" %}
+{% block content %}
+    <h2>
+        Page you tried to access doesn't exist or is protected
+    </h2>
+    </br>
+    <div style="text-align: center;">
+        <a href="{{ url_for('index') }}">Return to main page</a>
+    </div>
+{% endblock content %}

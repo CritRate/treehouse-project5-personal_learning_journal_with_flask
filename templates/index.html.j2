@@ -3,7 +3,7 @@
 <title>MyJournal</title>
 {% endblock %} 
 {% block content %}
-    {% if data.count() == 0 %}
+    {% if not data %}
         <h2>
             There's nothing to see here. Try adding something.
         </h2>
@@ -11,11 +11,16 @@
     {% for entry in data %}
         <article>
             <h2>
-                <a href="{{ url_for('detail', slug=entry.slug) }}">{{ entry.title }}</a>
+                <a href="{{ url_for('detail', slug=entry[0].slug) }}">{{ entry[0].title }}</a>
             </h2>
-            <time datetime="{{ entry.date.strftime('%Y-%d-%m') }}">
-                {{ entry.date.strftime('%B %d, %Y') }}
+            <time datetime="{{ entry[0].date.strftime('%Y-%d-%m') }}">
+                {{ entry[0].date.strftime('%B %d, %Y') }} by {{ entry[2] }}
             </time>
+            </br>
+            </br>
+            {% for tag in entry[1] %}
+                <a href="{{ url_for('tag', tag=tag.tag) }}" class="tag">{{ tag.tag }}</a>
+            {% endfor %}
         </article>
     {% endfor %}
 {% endblock %}

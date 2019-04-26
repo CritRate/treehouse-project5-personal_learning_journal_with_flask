@@ -2,6 +2,7 @@ from peewee import *
 
 from flask_login import UserMixin
 from flask_bcrypt import generate_password_hash
+from flask import g
 
 import string
 
@@ -16,6 +17,25 @@ def create_slug(title):
     slug = title.translate(str.maketrans('', '', string.punctuation))
     slug = slug.replace(' ', '-')
     return slug
+
+
+def get_data(slug=None):
+    data = list()
+    if not slug:
+        entries = (Entry.select()
+                   .order_by(-Entry.date).paginate(g.page, 10))
+        for entry in entries:
+            tag = (Tag.select().join(Entry).where(
+                Entry.id == entry.id))
+            username = User.get_by_id(entry.user).username
+            data.append((entry, tag, username))
+    else:
+        entry = Entry.get(Entry.slug == slug)
+        tag = (Tag.select().join(Entry).where(
+            Entry.id == entry.id))
+        username = User.get_by_id(entry.user).username
+        data.append((entry, tag, username))
+    return data
 
 
 class User(UserMixin, Model):
