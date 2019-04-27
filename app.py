@@ -4,7 +4,6 @@ from flask_login import (LoginManager, login_user,
                          logout_user, login_required, current_user)
 from flask_bcrypt import check_password_hash
 
-from peewee import *
 from math import ceil
 
 import models
