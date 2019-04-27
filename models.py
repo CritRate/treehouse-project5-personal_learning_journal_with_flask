@@ -19,21 +19,24 @@ def create_slug(title):
     return slug
 
 
-def get_data(slug=None):
+def get_data(query=None, slug=None):
+    """ 
+    if slug is None gets all the entries for index page or tag page
+    otherwise gets the entry specified by slug
+    """
     data = list()
     if not slug:
-        entries = (Entry.select()
-                   .order_by(-Entry.date).paginate(g.page, 10))
-        for entry in entries:
+        page_query = query.paginate(g.page, 10)
+        for entry in page_query:
             tag = (Tag.select().join(Entry).where(
                 Entry.id == entry.id))
-            username = User.get_by_id(entry.user).username
+            username = User.get(id=entry.user).username
             data.append((entry, tag, username))
     else:
         entry = Entry.get(Entry.slug == slug)
         tag = (Tag.select().join(Entry).where(
             Entry.id == entry.id))
-        username = User.get_by_id(entry.user).username
+        username = User.get(id=entry.user).username
         data.append((entry, tag, username))
     return data
 

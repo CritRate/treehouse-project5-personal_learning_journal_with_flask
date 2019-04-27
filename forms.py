@@ -18,9 +18,13 @@ def name_exists(form, field):
 
 def title_exists(form, field):
     try:
+        # edit only if the slug is the same or it doesnt exist yet
         models.Entry.get(models.Entry.slug**models.create_slug(field.data))
         if request.path.endswith('/edit'):
-            return None
+            slug = request.path.replace('/entries/', '')
+            slug = slug.replace('/edit', '')
+            if slug == models.create_slug(field.data):
+                return None
         raise ValidationError('Title already exists! Try a different one')
     except models.DoesNotExist:
         return None
